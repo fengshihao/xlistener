@@ -16,8 +16,8 @@ XListener是观察者模型的实现。 可以让开发者用最简单的方式�
 
 ## 使用
 
-```
 
+```
 import com.fengshihao.xlistener.XListener;
 import com.fengshihao.xlistenerprocessor.GenerateNotifier;
 
