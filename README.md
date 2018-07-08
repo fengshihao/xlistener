@@ -8,7 +8,7 @@ XListener是观察者模型的实现。 可以让开发者用最简单的方式�
 class Player {
    public void play() {}
    public void pause() {}
-   pbulic void stop() {}
+   public void stop() {}
 }
 ```
 播放器会有一些事件需要其他模块处理，不能把其他的逻辑，比如UI的展示，写在播放器中，于是你创建一个listener
@@ -32,7 +32,7 @@ class Player {
    public void pause() {
    }
    
-   pbulic void stop() {
+   public void stop() {
        mListener.onStop();
    }
 }
