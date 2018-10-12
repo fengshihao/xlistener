@@ -1,14 +1,11 @@
-package com.example.fengshihao.xlistener;
+package com.fengshihao.example.xlistener;
 
 import android.graphics.Camera;
-import android.util.Log;
 
 import com.fengshihao.xlistener.XListener;
 import com.fengshihao.xlistenerprocessor.GenerateNotifier;
 
 import java.nio.Buffer;
-
-import io.reactivex.annotations.NonNull;
 
 
 @GenerateNotifier
@@ -22,7 +19,7 @@ interface TestListener {
 interface CameraListener {
     default void onOpen(Camera camera, int open) {};
     default void onClosed() {};
-    default void hasEvent(int event, @NonNull String error) {};
+    default void hasEvent(int event, String error) {};
 }
 
 /**
