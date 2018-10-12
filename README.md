@@ -1,6 +1,8 @@
 
 ## 什么是XListener？
 
+
+**注意这个工程的app 是没法运行的. 运行示例, 在AndroidStudio中用右键选择test工程目录运行**
 XListener是观察者模型的实现。 可以让开发者用最简单的方式写出各种Listener。 它主要目的是替换EventBus。
 
 想象这么个场景， 你创建了一个播放器类 
