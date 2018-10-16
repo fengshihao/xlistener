@@ -19,32 +19,39 @@ class CodeGenerator {
         for (String methodName: methods.keySet()) {
             List<String> parameters = methods.get(methodName);
             code.append(getMethodCode(methodName, parameters));
+            code.append("\n");
         }
-        code.append("\n");
         return code.toString();
     }
 
+
     private String getMethodCode(String methodName, List<String> parameters) {
-        StringBuilder code = new StringBuilder("    @Override\n" +
-                "    public void " + methodName + " (");
-        StringBuffer plist = new StringBuffer();
+        final String METHOD_TMPL =
+                "    @Override"                                         + "\n" +
+                "    public void METHOD(PARAMS) {"                      + "\n" +
+                "        for (INTERFACE l: mListeners) {"               + "\n" +
+                "            l.METHOD(NAMES);"                          + "\n" +
+                "        }"                                             + "\n" +
+                "    }"                                                 + "\n";
+
+
+        String params = "";
+        String paramNames = "";
 
         int lastParam = parameters.size() - 2;
         for (int i = 0; i < parameters.size() ; i+=2) {
-            String pt = parameters.get(i);
-            String pn = parameters.get(i + 1);
-            code.append(pt).append(" ").append(pn);
-            plist.append(pn);
+            String paramType = parameters.get(i);
+            String paramName = parameters.get(i + 1);
+            params += paramType + " " + paramName;
+            paramNames += paramName;
             if (i != lastParam) {
-                code.append(", ");
-                plist.append(", ");
+                params += ", ";
+                paramNames += ", ";
             }
         }
-        code.append(") {\n").append(
-                "      for (").append(interfaceName).append(" l: mListeners) {\n")
-                .append("        l.").append(methodName).append("(").append(plist).append(");\n").append("      }\n    }\n");
-
-        return code.toString();
+        return METHOD_TMPL.replace("METHOD", methodName)
+                .replace("PARAMS", params)
+                .replace("NAMES", paramNames);
     }
 
     String toCode() {
@@ -63,7 +70,6 @@ class CodeGenerator {
             "    private String logTag = \"INTERFACEList\";\n" +
             "\n" +
             "notify_methods" +
-            "\n" +
             "    public void addListener(INTERFACE listener) {\n" +
             "        if (listener == null) {\n" +
             "            loge(\"addListener: wrong arg null\");\n" +
