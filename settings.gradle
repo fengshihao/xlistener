@@ -1,1 +1,1 @@
-include ':app', ':XListenerProcessor', ':XListener'
+include ':app', ':XListenerProcessor'

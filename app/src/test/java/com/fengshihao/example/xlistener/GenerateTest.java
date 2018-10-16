@@ -2,13 +2,12 @@ package com.fengshihao.example.xlistener;
 
 import android.graphics.Camera;
 
-import com.fengshihao.xlistener.XListener;
 import com.fengshihao.xlistenerprocessor.GenerateNotifier;
 
 import java.nio.Buffer;
 
 
-@GenerateNotifier
+@GenerateNotifier(notifyOnMainThread = true)
 interface TestListener {
     default void onX(int x) {}
     default void onY(int x, float y, String cc, Buffer bf) {};
@@ -27,13 +26,9 @@ interface CameraListener {
  */
 
 public class GenerateTest {
-    XListener<CameraListener> mCameraListeners = new XListener<>(CameraListener.class.getSimpleName());
-
-    XListener<TestListener> mTestListeners = new XListener<>(TestListener.class.getSimpleName());
-
-
-    public void testCameraListener() {
-        mCameraListeners.addListener(new CameraListener() {
+    public void testCameraListenerList() {
+        CameraListenerList l = new CameraListenerList();
+        l.addListener(new CameraListener() {
             @Override
             public void onOpen(Camera camera, int open) {
                 log( "onOpen() called with: camera = [" + camera + "], open = [" + open + "]");
@@ -49,24 +44,9 @@ public class GenerateTest {
                 log( "hasEvent() called with: event = [" + event + "], error = [" + error + "]");
             }
         });
-        CameraListenerNotifier.notifyHasEvent(mCameraListeners, 5, "hello");
-        CameraListenerNotifier.notifyOnClosed(mCameraListeners);
-        CameraListenerNotifier.notifyOnOpen(mCameraListeners, null, 10);
-        mCameraListeners.clean();
-    }
 
-
-    public void testListener() {
-        mTestListeners.addListener(new TestListener() {
-            @Override
-            public void onX(int x) {
-                log("onX() called with: x = [" + x + "]");
-            }
-        });
-        TestListenerNotifier.notifyOnX(mTestListeners, 100);
-        TestListenerNotifier.notifyOnY(mTestListeners, 19, 2, "hello", null);
-
-        mCameraListeners.clean();
+        l.onClosed();
+        l.onOpen(null, 10);
     }
 
     private void log(String s) {

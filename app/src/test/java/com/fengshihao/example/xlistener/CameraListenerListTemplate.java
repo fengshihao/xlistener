@@ -1,20 +1,38 @@
-package com.fengshihao.xlistener;
+package com.fengshihao.example.xlistener;
 
-import java.util.LinkedList;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class XListener<T> {
-    private List<T> mListeners = new LinkedList<>();
-    private String logTag = XListener.class.getSimpleName();
+/**
+ * Created by fengshihao on 18-10-14.
+ */
 
-    public XListener(String name) {
-        if (name == null || "".equals(name)) {
-            return;
+public class CameraListenerListTemplate implements CameraListener {
+    private List<CameraListener> mListeners = new ArrayList<>();
+    private String logTag = "CameraListenerList";
+
+    @Override
+    public void onClosed () {
+        for (CameraListener l: mListeners) {
+            l.onClosed();
         }
-        logTag = name;
     }
 
-    public void addListener(T listener) {
+    @Override
+    public void onOpen (android.graphics.Camera camera, int open) {
+        for (CameraListener l: mListeners) {
+            l.onOpen(camera,open);
+        }
+    }
+
+    @Override
+    public void hasEvent (int event, java.lang.String error) {
+        for (CameraListener l: mListeners) {
+            l.hasEvent(event,error);
+        }
+    }
+    public void addListener(CameraListener listener) {
         if (listener == null) {
             loge("addListener: wrong arg null");
             return;
@@ -27,7 +45,7 @@ public class XListener<T> {
         log("addListener: now has listener=" + mListeners.size());
     }
 
-    public T removeListener(T listener) {
+    public CameraListener removeListener(CameraListener listener) {
         if (listener == null) {
             loge("removeListener: wrong arg null");
             return null;
@@ -40,7 +58,7 @@ public class XListener<T> {
             loge("removeListener: did not find this listener " + listener);
             return null;
         }
-        T r = mListeners.remove(idx);
+        CameraListener r = mListeners.remove(idx);
         log("removeListener: now has listener=" + mListeners.size());
         return r;
     }
@@ -51,7 +69,7 @@ public class XListener<T> {
         mListeners.clear();
     }
 
-    public List<T> getListeners() {
+    public List<CameraListener> getListeners() {
         return mListeners;
     }
 
@@ -62,4 +80,5 @@ public class XListener<T> {
     private void loge(String info) {
         System.err.println(logTag + " " + info);
     }
+    
 }

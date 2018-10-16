@@ -10,4 +10,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.SOURCE)
 public @interface GenerateNotifier {
 
+    boolean notifyOnMainThread() default false;
 }
