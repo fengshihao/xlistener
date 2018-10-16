@@ -1,4 +1,4 @@
-package com.fengshihao.xlistenerprocessor;
+package com.fengshihao.xlistener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 @Retention(RetentionPolicy.SOURCE)
-public @interface GenerateNotifier {
+public @interface XListener {
 
     boolean notifyOnMainThread() default false;
 }

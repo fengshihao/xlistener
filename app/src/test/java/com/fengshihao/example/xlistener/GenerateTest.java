@@ -2,19 +2,19 @@ package com.fengshihao.example.xlistener;
 
 import android.graphics.Camera;
 
-import com.fengshihao.xlistenerprocessor.GenerateNotifier;
+import com.fengshihao.xlistener.XListener;
 
 import java.nio.Buffer;
 
 
-@GenerateNotifier(notifyOnMainThread = true)
+@XListener(notifyOnMainThread = true)
 interface TestListener {
     default void onX(int x) {}
     default void onY(int x, float y, String cc, Buffer bf) {};
 }
 
 
-@GenerateNotifier
+@XListener
 interface CameraListener {
     default void onOpen(Camera camera, int open) {};
     default void onClosed() {};
