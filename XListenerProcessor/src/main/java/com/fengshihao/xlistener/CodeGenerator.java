@@ -29,12 +29,21 @@ class CodeGenerator {
         final String METHOD_TMPL =
                 "    @Override"                                         + "\n" +
                 "    public void METHOD(PARAMS) {"                      + "\n" +
-                "        for (INTERFACE l: mListeners) {"               + "\n" +
-                "            l.METHOD(NAMES);"                          + "\n" +
+                "        if (mHandler == null || isRightThread()) {"    + "\n" +
+                "METHOD_INNER_TMPL"                                     + "\n" +
+                "            return;"                                   + "\n" +
                 "        }"                                             + "\n" +
+                "        mHandler.post(() -> {"                         + "\n" +
+                "METHOD_INNER_TMPL"                                     + "\n" +
+                "        });"                                           + "\n" +
                 "    }"                                                 + "\n";
 
+        final String METHOD_INNER_TMPL =
+                "           for (INTERFACE l: mListeners) {"               + "\n" +
+                "               l.METHOD(NAMES);"                          + "\n" +
+                "           }";
 
+        final String METHOD_T = METHOD_TMPL.replace("METHOD_INNER_TMPL", METHOD_INNER_TMPL);
         String params = "";
         String paramNames = "";
 
@@ -49,7 +58,7 @@ class CodeGenerator {
                 paramNames += ", ";
             }
         }
-        return METHOD_TMPL.replace("METHOD", methodName)
+        return METHOD_T.replace("METHOD", methodName)
                 .replace("PARAMS", params)
                 .replace("NAMES", paramNames);
     }
@@ -75,17 +84,17 @@ class CodeGenerator {
             "METHODS_BODY" +
             "    private Handler mHandler;\n" +
 
-            "public void attachToCurrentThread() {\n" +
-            "    if (Looper.myLooper() == null) {\n" +
-            "        Log.e(TAG, \"this thread do not has looper!\");\n" +
-            "        return;\n" +
+            "    public void attachToCurrentThread() {\n" +
+            "        if (Looper.myLooper() == null) {\n" +
+            "            Log.e(TAG, \"this thread do not has looper!\");\n" +
+            "            return;\n" +
+            "        }\n" +
+            "        mHandler = new Handler(Looper.myLooper());\n" +
             "    }\n" +
-            "    mHandler = new Handler(Looper.myLooper());\n" +
-            "}\n" +
             "\n" +
-            "public void attachToMainThread() {\n" +
-            "    mHandler = new Handler(Looper.getMainLooper());\n" +
-            "}" +
+            "    public void attachToMainThread() {\n" +
+            "        mHandler = new Handler(Looper.getMainLooper());\n" +
+            "    }" +
             "\n" +
             "    private boolean isRightThread() {\n" +
             "        return mHandler.getLooper() == Looper.myLooper();\n" +
