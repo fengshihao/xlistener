@@ -55,37 +55,58 @@ class CodeGenerator {
     }
 
     String toCode() {
-        String code = Template.replace("notify_methods", getMethodsCode());
+        String code = Template.replace("METHODS_BODY", getMethodsCode());
         return code.replace("INTERFACE", interfaceName);
     }
 
     private String Template = "package com.fengshihao.example.xlistener;\n" +
             "\n" +
             "\n" +
+            "import android.os.Handler;\n" +
+            "import android.os.Looper;\n" +
+            "import android.util.Log;\n" +
             "import java.util.ArrayList;\n" +
             "import java.util.List;\n" +
+
             "\n" +
             "public class INTERFACEList implements INTERFACE {\n" +
             "    private List<INTERFACE> mListeners = new ArrayList<>();\n" +
-            "    private String logTag = \"INTERFACEList\";\n" +
+            "    private static final String TAG = \"INTERFACEList\";\n" +
+            "METHODS_BODY" +
+            "    private Handler mHandler;\n" +
+
+            "public void attachToCurrentThread() {\n" +
+            "    if (Looper.myLooper() == null) {\n" +
+            "        Log.e(TAG, \"this thread do not has looper!\");\n" +
+            "        return;\n" +
+            "    }\n" +
+            "    mHandler = new Handler(Looper.myLooper());\n" +
+            "}\n" +
             "\n" +
-            "notify_methods" +
+            "public void attachToMainThread() {\n" +
+            "    mHandler = new Handler(Looper.getMainLooper());\n" +
+            "}" +
+            "\n" +
+            "    private boolean isRightThread() {\n" +
+            "        return mHandler.getLooper() == Looper.myLooper();\n" +
+            "    }\n" +
+            "\n" +
             "    public void addListener(INTERFACE listener) {\n" +
             "        if (listener == null) {\n" +
-            "            loge(\"addListener: wrong arg null\");\n" +
+            "            Log.e(TAG, \"addListener: wrong arg null\");\n" +
             "            return;\n" +
             "        }\n" +
             "        if (mListeners.contains(listener)) {\n" +
-            "            loge(\"addListener: already in \" + listener);\n" +
+            "            Log.e(TAG, \"addListener: already in \" + listener);\n" +
             "            return;\n" +
             "        }\n" +
             "        mListeners.add(listener);\n" +
-            "        log(\"addListener: now has listener=\" + mListeners.size());\n" +
+            "        Log.d(TAG, \"addListener: now has listener=\" + mListeners.size());\n" +
             "    }\n" +
             "\n" +
             "    public INTERFACE removeListener(INTERFACE listener) {\n" +
             "        if (listener == null) {\n" +
-            "            loge(\"removeListener: wrong arg null\");\n" +
+            "            Log.e(TAG, \"removeListener: wrong arg null\");\n" +
             "            return null;\n" +
             "        }\n" +
             "        if (mListeners.isEmpty()) {\n" +
@@ -93,27 +114,18 @@ class CodeGenerator {
             "        }\n" +
             "        int idx = mListeners.indexOf(listener);\n" +
             "        if (idx == -1) {\n" +
-            "            loge(\"removeListener: did not find this listener \" + listener);\n" +
+            "            Log.e(TAG, \"removeListener: did not find this listener \" + listener);\n" +
             "            return null;\n" +
             "        }\n" +
             "        INTERFACE r = mListeners.remove(idx);\n" +
-            "        log(\"removeListener: now has listener=\" + mListeners.size());\n" +
+            "        Log.d(TAG, \"removeListener: now has listener=\" + mListeners.size());\n" +
             "        return r;\n" +
             "    }\n" +
             "\n" +
             "\n" +
             "    public void clean() {\n" +
-            "        log(\"clean() called\");\n" +
+            "        Log.d(TAG, \"clean() called\");\n" +
             "        mListeners.clear();\n" +
             "    }\n" +
-            "\n" +
-            "    private void log(String info) {\n" +
-            "        System.out.println(logTag + \" \" + info);\n" +
-            "    }\n" +
-            "\n" +
-            "    private void loge(String info) {\n" +
-            "        System.err.println(logTag + \" \" + info);\n" +
-            "    }\n" +
-            "    \n" +
             "}\n";
 }

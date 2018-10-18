@@ -17,5 +17,8 @@ public class MainActivity extends Activity {
 
             });
         }
+
+        GenerateTest test = new GenerateTest();
+        test.testCameraListenerList();
     }
 }

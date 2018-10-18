@@ -1,6 +1,10 @@
 package com.fengshihao.example.xlistener;
 
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +14,24 @@ import java.util.List;
 
 public class CameraListenerListTemplate implements CameraListener {
     private List<CameraListener> mListeners = new ArrayList<>();
-    private String logTag = "CameraListenerList";
+    private static final String TAG = "CameraListenerList";
+    private Handler mHandler;
+
+    public void attachToCurrentThread() {
+        if (Looper.myLooper() == null) {
+            Log.e(TAG, "CameraListenerListTemplate: this thread do not has looper!");
+            return;
+        }
+        mHandler = new Handler(Looper.myLooper());
+    }
+
+    public void attachToMainThread() {
+        mHandler = new Handler(Looper.getMainLooper());
+    }
+
+    private boolean isRightThread() {
+        return mHandler.getLooper() == Looper.myLooper();
+    }
 
     @Override
     public void onClosed () {
@@ -21,8 +42,16 @@ public class CameraListenerListTemplate implements CameraListener {
 
     @Override
     public void onOpen (android.graphics.Camera camera, int open) {
-        for (CameraListener l: mListeners) {
-            l.onOpen(camera,open);
+        if (mHandler == null || isRightThread()) {
+            for (CameraListener l: mListeners) {
+                l.onOpen(camera,open);
+            }
+        } else {
+            mHandler.post(() -> {
+                for (CameraListener l: mListeners) {
+                    l.onOpen(camera,open);
+                }
+            });
         }
     }
 
@@ -34,20 +63,20 @@ public class CameraListenerListTemplate implements CameraListener {
     }
     public void addListener(CameraListener listener) {
         if (listener == null) {
-            loge("addListener: wrong arg null");
+            Log.e(TAG, "addListener: wrong arg null");
             return;
         }
         if (mListeners.contains(listener)) {
-            loge("addListener: already in " + listener);
+            Log.e(TAG, "addListener: already in " + listener);
             return;
         }
         mListeners.add(listener);
-        log("addListener: now has listener=" + mListeners.size());
+        Log.d(TAG, "addListener: now has listener=" + mListeners.size());
     }
 
     public CameraListener removeListener(CameraListener listener) {
         if (listener == null) {
-            loge("removeListener: wrong arg null");
+            Log.w(TAG, "removeListener: wrong arg null");
             return null;
         }
         if (mListeners.isEmpty()) {
@@ -55,30 +84,20 @@ public class CameraListenerListTemplate implements CameraListener {
         }
         int idx = mListeners.indexOf(listener);
         if (idx == -1) {
-            loge("removeListener: did not find this listener " + listener);
+            Log.e(TAG, "removeListener: did not find this listener " + listener);
             return null;
         }
         CameraListener r = mListeners.remove(idx);
-        log("removeListener: now has listener=" + mListeners.size());
+        Log.d(TAG, "removeListener: now has listener=" + mListeners.size());
         return r;
     }
 
 
     public void clean() {
-        log("clean() called");
+        Log.d(TAG, "clean() called");
+        if (mHandler != null) {
+            mHandler.removeCallbacks(null);
+        }
         mListeners.clear();
     }
-
-    public List<CameraListener> getListeners() {
-        return mListeners;
-    }
-
-    private void log(String info) {
-        System.out.println(logTag + " " + info);
-    }
-
-    private void loge(String info) {
-        System.err.println(logTag + " " + info);
-    }
-    
 }

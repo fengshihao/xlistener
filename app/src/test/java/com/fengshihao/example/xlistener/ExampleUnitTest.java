@@ -11,8 +11,6 @@ public class ExampleUnitTest {
 
     @Test
     public void testListenerGenerate() {
-        GenerateTest test1 = new GenerateTest();
-        test1.testCameraListenerList();
     }
 }
 
