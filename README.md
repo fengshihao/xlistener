@@ -2,9 +2,6 @@
 ## 什么是XListener？
 
 
-**注意这个工程的app 是没法运行的. 运行示例, 在AndroidStudio中用右键选择test工程目录运行**
-
-
 XListener是观察者模型的实现。 可以让开发者用最简单的方式写出各种Listener。 它主要目的是替换EventBus。
 
 想象这么个场景， 你创建了一个播放器类 
@@ -43,58 +40,82 @@ class Player {
 ```
 
 但是问题很快又来了。 关心这些事件的不是一个模块， 比如字幕模块， 声音模块...他们都需要知道什么时候开始播放 什么时候停止播放。
-于是Player.mListener变成了一个列表。 你得维护它。 并且写一堆for循环去通知这个list中的每个成员。 
-你的程序会有很多很多类 很多很多事件。 最后充斥这些看似一样但又稍微不同的代码。 这时候你和魔鬼（EventBus）做了个交易 让它给你
-自由， 从此你走上了不归路。 XListener 是解决这些问题的。 了解一下。
-
-
+于是Player.mListener变成了一个列表 PlayerListenerList。 你得维护它。
+ ```java
+ //这个类里边充斥着样板代码。 XListener可以方便的生成这种样板代码。 
+ public interface PlayerListenerList implements PlayerListener {
+   private List<PlayerListener> mListeners = new ArrayList<>();
+   
+   public void addListener(PlayerListener listener) {
+     ...
+   }
+   public void removeListener(PlayerListener listener) {
+     ...
+   }
+   
+   
+   @Override
+   public void onStarted() {
+      for (PlayerListener l: mListeners) {
+         l.onStarted();
+      }
+   }
+   
+   ....
+}
+ ```
 ## 为什么放弃EventBus
-
+ 这时候有很多人会想到EventBus。 但是EventBus 会引诱人们写各种凌乱的event。 然后就成了EventBugs。 
 * EventBus 使得程序逻辑杂乱无章， 看似解耦实则是为错误的设计做了补丁。 
 * 被迫定义各种Event， 调用和被调用方使用都很不方便。
 * 使用了反射的机制效率不高。
 
-## 特点
-* 使用模板类方式让开发者省去了编写addXXXListener() removeXXXListener() notifyXXXListener() 这样的样板代码
-* 使用代码生成方式保证Listener的调用效率， 和类型检查不失效。
-* 非常小的代价。 只有一个类模板， 一个预处理代码生成类。
+## XListener特点
+* 使用自动代码生成方式让开发者省去了编写addXListener() removeXListener() 这样的样板代码
+* 使用代码生成方式保证Listener的调用效率， 和类型检查不失效，调用方和被调用方在重构时保证参数正确。
+* 非常小的代价。几乎不影响现有接口， 生成的XListenerList 和 XListene的接口保持一致。
+* 可以设置XListenerList回调线程。 线程切换异常方便。
 
 ## 使用
 
 这个库还没有传送到maven或者jcenter上。 只能copy源码中的两个模块到自己工程中使用。 
 
+第一步：
+   gradle 添加依赖：
+   implementation 'com.fengshihao.xlistener:xlistener:1.0'
 
-
+第二部：
 ```java
-// 主要是用这两个类
 import com.fengshihao.xlistener.XListener;
-import com.fengshihao.xlistenerprocessor.GenerateNotifier;
 
-// 如果一个接口加了GenerateNotifier注解之后会生成相应的class TestListenerNotifier
-// TestListenerNotifier 作用在下边代码有解释。
-@GenerateNotifier 
+@XListener  //使用完成代码自动生成 TestListenerList 类，和TestListener包一样.
 interface TestListener {
     default void onX(int x) {}
-    default void onY(int x, float y, String cc, Buffer bf) {};
+    default void onY(int x, float y, String z) {}
+    void onZ();
 }
 
-public class GenerateTest {
+```
 
-    // XListener内部维护着一个TestListener列表。 可以管理这个list， 省去编写addXListener这种样板代码
-    XListener<TestListener> mTestListeners = new XListener<>("name_for_log");
+第三部：
+```java
+TestListenerList t = new TestListenerList();
+// 之后onX, onZ... 将会被在主线程调用。 如果调用attachToCurrentThread，会让回调在当前线程
+t.attachToMainThread(); 
+t.addListener(new TestListener() {
+   @Override
+   public void onX(int x) {
+       Log.d(TAG, "onX() called with: x = [" + x + "] thread=" + Thread.currentThread().getName());
+   }
 
-    public void testListener() {
-        mTestListeners.addListener(new TestListener() {
-            @Override
-            public void onX(int x) {
-                log("onX() called with: x = [" + x + "]");
-            }
-        });
-        // 这里就是TestListenerNotifier的作用， 用来通知XListener中每个listener什么事件发生了。 注意第一个参数是个XListener类型
-        TestListenerNotifier.notifyOnX(mTestListeners, 100);
-        TestListenerNotifier.notifyOnY(mTestListeners, 19, 2, "hello", null);
+   @Override
+   public void onZ() {
+       Log.d(TAG, "onZ() called on thread=" + Thread.currentThread().getName());
+   }
+});
 
-        mCameraListeners.clean();
-    }
+t.onX(100);
+t.onZ();    
+t.clean(); //清空listener列表
 ```
 
