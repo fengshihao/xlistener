@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.fengshihao.xlistener.XListener;
 
-@XListener()
+@XListener
 interface TestListener {
     default void onX(int x) {}
     default void onY(int x, float y, String z) {}

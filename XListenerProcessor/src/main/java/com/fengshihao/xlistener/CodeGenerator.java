@@ -101,6 +101,36 @@ class CodeGenerator {
             "    }\n" +
             "\n" +
             "    public void addListener(INTERFACE listener) {\n" +
+            "        if (mHandler == null || isRightThread()) {"    + "\n" +
+            "            addListener_(listener);"                   + "\n" +
+            "            return;"                                   + "\n" +
+            "        }"                                             + "\n" +
+            "        mHandler.post(() -> {"                         + "\n" +
+            "            addListener_(listener);"                   + "\n" +
+            "        });"                                           + "\n" +
+            "    }\n" +
+            "\n" +
+            "    public void removeListener(INTERFACE listener) {\n" +
+            "        if (mHandler == null || isRightThread()) {"    + "\n" +
+            "            removeListener_(listener);"                + "\n" +
+            "            return;"                                   + "\n" +
+            "        }"                                             + "\n" +
+            "        mHandler.post(() -> {"                         + "\n" +
+            "            removeListener_(listener);"                + "\n" +
+            "        });"                                           + "\n" +
+            "    }\n" +
+            "\n" +
+            "    public void clean() {\n" +
+            "        if (mHandler == null || isRightThread()) {"    + "\n" +
+            "            clean_();"                                 + "\n" +
+            "            return;"                                   + "\n" +
+            "        }"                                             + "\n" +
+            "        mHandler.post(() -> {"                         + "\n" +
+            "            clean_();"                                 + "\n" +
+            "        });"                                           + "\n" +
+            "    }\n" +
+            "\n" +
+            "    private void addListener_(INTERFACE listener) {\n" +
             "        if (listener == null) {\n" +
             "            Log.e(TAG, \"addListener: wrong arg null\");\n" +
             "            return;\n" +
@@ -113,7 +143,7 @@ class CodeGenerator {
             "        Log.d(TAG, \"addListener: now has listener=\" + mListeners.size());\n" +
             "    }\n" +
             "\n" +
-            "    public INTERFACE removeListener(INTERFACE listener) {\n" +
+            "    private INTERFACE removeListener_(INTERFACE listener) {\n" +
             "        if (listener == null) {\n" +
             "            Log.e(TAG, \"removeListener: wrong arg null\");\n" +
             "            return null;\n" +
@@ -131,8 +161,7 @@ class CodeGenerator {
             "        return r;\n" +
             "    }\n" +
             "\n" +
-            "\n" +
-            "    public void clean() {\n" +
+            "    private void clean_() {\n" +
             "        Log.d(TAG, \"clean() called\");\n" +
             "        mListeners.clear();\n" +
             "    }\n" +
