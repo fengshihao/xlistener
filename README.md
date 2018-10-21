@@ -78,8 +78,6 @@ class Player {
 
 ## 使用
 
-这个库还没有传送到maven或者jcenter上。 只能copy源码中的两个模块到自己工程中使用。 
-
 第一步：
    gradle 添加依赖：
    implementation 'com.fengshihao.xlistener:xlistener:1.0'
