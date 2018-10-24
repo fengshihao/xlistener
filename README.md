@@ -1,6 +1,45 @@
 
-## 什么是XListener？
+## 使用
 
+第一步：
+   gradle 添加依赖：
+   compileOnly 'com.fengshihao.xlistener:xlistener:1.0'
+
+第二部：
+```java
+import com.fengshihao.xlistener.XListener;
+
+@XListener  //使用完成代码自动生成 TestListenerList 类，和TestListener包一样.
+interface TestListener {
+    default void onX(int x) {}
+    default void onY(int x, float y, String z) {}
+    void onZ();
+}
+
+```
+
+第三部：
+```java
+TestListenerList t = new TestListenerList();
+// 之后onX, onZ... 将会被在主线程调用。 如果调用attachToCurrentThread，会让回调在当前线程
+t.attachToMainThread(); 
+t.addListener(new TestListener() {
+   @Override
+   public void onX(int x) {
+       Log.d(TAG, "onX() called with: x = [" + x + "] thread=" + Thread.currentThread().getName());
+   }
+
+   @Override
+   public void onZ() {
+       Log.d(TAG, "onZ() called on thread=" + Thread.currentThread().getName());
+   }
+});
+
+t.onX(100);
+t.onZ();    
+t.clean(); //清空listener列表
+```
+## 什么是XListener？
 
 XListener是观察者模型的实现。 可以让开发者用最简单的方式写出各种Listener。 它主要目的是替换EventBus。
 
@@ -75,45 +114,3 @@ class Player {
 * 使用代码生成方式保证Listener的调用效率， 和类型检查不失效，调用方和被调用方在重构时保证参数正确。
 * 非常小的代价。几乎不影响现有接口， 生成的XListenerList 和 XListene的接口保持一致。
 * 可以设置XListenerList回调线程。 线程切换异常方便。
-
-## 使用
-
-第一步：
-   gradle 添加依赖：
-   implementation 'com.fengshihao.xlistener:xlistener:1.0'
-
-第二部：
-```java
-import com.fengshihao.xlistener.XListener;
-
-@XListener  //使用完成代码自动生成 TestListenerList 类，和TestListener包一样.
-interface TestListener {
-    default void onX(int x) {}
-    default void onY(int x, float y, String z) {}
-    void onZ();
-}
-
-```
-
-第三部：
-```java
-TestListenerList t = new TestListenerList();
-// 之后onX, onZ... 将会被在主线程调用。 如果调用attachToCurrentThread，会让回调在当前线程
-t.attachToMainThread(); 
-t.addListener(new TestListener() {
-   @Override
-   public void onX(int x) {
-       Log.d(TAG, "onX() called with: x = [" + x + "] thread=" + Thread.currentThread().getName());
-   }
-
-   @Override
-   public void onZ() {
-       Log.d(TAG, "onZ() called on thread=" + Thread.currentThread().getName());
-   }
-});
-
-t.onX(100);
-t.onZ();    
-t.clean(); //清空listener列表
-```
-
