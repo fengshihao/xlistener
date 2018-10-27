@@ -47,6 +47,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile project(path : ':XListenerProcessor')
-    //implementation 'com.fengshihao.xlistener:xlistener:1.0'
+    compileOnly project(path : ':XListenerProcessor')
+    //compileOnly 'com.fengshihao.xlistener:xlistener:1.0'
 }
