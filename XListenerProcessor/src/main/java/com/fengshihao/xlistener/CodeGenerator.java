@@ -64,11 +64,12 @@ class CodeGenerator {
     }
 
     String toCode() {
-        String code = Template.replace("METHODS_BODY", getMethodsCode());
+        String code = Template.replace("PACKAGE_NAME", packageName)
+                .replace("METHODS_BODY", getMethodsCode());
         return code.replace("INTERFACE", interfaceName);
     }
 
-    private String Template = "package com.fengshihao.example.xlistener;\n" +
+    private String Template = "package PACKAGE_NAME;\n" +
             "\n" +
             "\n" +
             "import android.os.Handler;\n" +
