@@ -8,7 +8,7 @@
     compileOnly 'com.fengshihao.xlistener:xlistener:1.0.1'
 ```
 
-第二部：
+第二步：
 ```java
 import com.fengshihao.xlistener.XListener;
 
@@ -21,7 +21,7 @@ interface TestListener {
 
 ```
 
-第三部：
+第三步：
 ```java
 TestListenerList t = new TestListenerList();
 // 之后onX, onZ... 将会被在主线程调用。 如果调用attachToCurrentThread，会让回调在当前线程
