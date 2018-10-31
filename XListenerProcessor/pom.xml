@@ -6,7 +6,7 @@
 
   <groupId>com.fengshihao.xlistener</groupId>
   <artifactId>xlistener</artifactId>
-  <version>1.0</version>
+  <version>1.0.1</version>
 
   <name>xlistener</name>
   <description>A simple tool to generate any listener's list.</description>
