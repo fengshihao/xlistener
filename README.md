@@ -3,8 +3,10 @@
 
 第一步：
    gradle 添加依赖：
+```
     annotationProcessor 'com.fengshihao.xlistener:xlistener:1.0.1'
     compileOnly 'com.fengshihao.xlistener:xlistener:1.0.1'
+```
 
 第二部：
 ```java
